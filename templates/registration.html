@@ -1,0 +1,44 @@
+{% extends 'main.html' %}
+{% block title%} OTS Registration Status {% endblock %}
+{% block top%}
+<a href="{% url 'OTS:registrationForm' %}"><i class="fas fa-user-plus"></i> Signup</a>
+<a href="{% url 'OTS:login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+{% endblock %}
+{% block content %}
+<div class="status-container">
+    {% if userStatus == 1%}
+        <div class="status-card error">
+            <div class="status-icon">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <h2>Username Already Exists</h2>
+            <p>Sorry, this username is already taken. Please try a different username.</p>
+            <a href="{% url 'OTS:registrationForm' %}" class="status-btn">
+                <i class="fas fa-arrow-left"></i> Back to Registration
+            </a>
+        </div>
+    {% elif userStatus == 2 %}
+        <div class="status-card success">
+            <div class="status-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Registration Successful!</h2>
+            <p>Congratulations! Your account has been created successfully.</p>
+            <a href="{% url 'OTS:login' %}" class="status-btn">
+                <i class="fas fa-sign-in-alt"></i> Login Now
+            </a>
+        </div>
+    {% elif userStatus == 3 %}
+        <div class="status-card error">
+            <div class="status-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2>Registration Failed</h2>
+            <p>Oops! Something went wrong during registration. Please try again.</p>
+            <a href="{% url 'OTS:registrationForm' %}" class="status-btn">
+                <i class="fas fa-redo"></i> Try Again
+            </a>
+        </div>
+    {% endif%}
+</div>
+{% endblock %}

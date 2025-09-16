@@ -1,0 +1,114 @@
+{% extends 'main.html' %}
+
+{% block title %}OTS Test Paper{% endblock %}
+
+{% block top %}{% endblock %}
+
+{% block content %}
+<div class="test-timer-bar" style="background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:0 6px 16px rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:space-between;">
+  <div style="display:flex;align-items:center;gap:12px;color:#1f2937;">
+    <span style="display:inline-flex;width:38px;height:38px;border-radius:999px;align-items:center;justify-content:center;background:#EEF2FF;color:#4F46E5;font-weight:700;">⏱</span>
+    <div>
+      <div style="font-weight:800;color:#111827;">Time Remaining</div>
+      <div id="countdown" style="font-weight:700;color:#4F46E5;font-size:1.1rem;">--:--</div>
+    </div>
+  </div>
+  <div style="flex:1;max-width:520px;margin-left:16px;">
+    <div style="height:10px;background:#E5E7EB;border-radius:999px;overflow:hidden;">
+      <div id="time-progress" style="height:10px;width:0%;background:linear-gradient(90deg,#22C55E,#10B981);transition:width .3s;"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:.85rem;color:#6B7280;">
+      <span>Start</span>
+      <span>Total: {{ total_duration_seconds|default:0 }}s</span>
+    </div>
+  </div>
+</div>
+
+<form id="test-form" action="{% url 'OTS:calculateTest' %}" method="post" style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 10px 24px rgba(0,0,0,0.08);">
+  {% csrf_token %}
+  {% for question in questions %}
+    <div class="question" style="color:#1f2937;font-size:18px;margin:16px 0;padding-bottom:8px;border-bottom:1px solid #e5e7eb;">
+      <input type="hidden" name="qno{{question.qid}}" value="{{question.qid}}">
+      <strong>Q{{ forloop.counter }}.</strong> {{question.que}}
+    </div>
+    <div class="options" style="margin-bottom:12px;">
+      <label style="display:block;padding:10px;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;cursor:pointer;">
+        <input type="radio" name="q{{question.qid}}" value="A" style="margin-right:8px;"> {{question.a}}
+      </label>
+      <label style="display:block;padding:10px;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;cursor:pointer;">
+        <input type="radio" name="q{{question.qid}}" value="B" style="margin-right:8px;"> {{question.b}}
+      </label>
+      <label style="display:block;padding:10px;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;cursor:pointer;">
+        <input type="radio" name="q{{question.qid}}" value="C" style="margin-right:8px;"> {{question.c}}
+      </label>
+      <label style="display:block;padding:10px;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;cursor:pointer;">
+        <input type="radio" name="q{{question.qid}}" value="D" style="margin-right:8px;"> {{question.d}}
+      </label>
+    </div>
+  {% endfor %}
+  <div style="text-align:center;margin-top:20px;">
+    <input id="submit-btn" type="submit" value="Submit" style="background:#10B981;color:white;border:none;padding:12px 24px;border-radius:10px;cursor:pointer;font-weight:700;">
+  </div>
+</form>
+
+<script>
+(function() {
+  var remaining = {{ time_limit_seconds|default:0 }};
+  var total = {{ total_duration_seconds|default:0 }};
+  var warnOnLeave = {{ show_leave_warning|yesno:"true,false" }};
+  var display = document.getElementById('countdown');
+  var bar = document.getElementById('time-progress');
+  var form = document.getElementById('test-form');
+  var submitted = false;
+
+  function render() {
+    var m = Math.floor(remaining / 60);
+    var s = (remaining % 60);
+    var mm = String(m).padStart(2, '0');
+    var ss = String(s).padStart(2, '0');
+    display.textContent = mm + ':' + ss;
+
+    var elapsed = Math.max(0, total - remaining);
+    var pct = total > 0 ? (elapsed / total) * 100 : 0;
+    bar.style.width = pct.toFixed(2) + '%';
+
+    if (remaining <= 60) {
+      display.style.color = '#DC2626';
+      bar.style.background = 'linear-gradient(90deg,#F59E0B,#EF4444)';
+    }
+  }
+
+  render();
+
+  var interval = setInterval(function() {
+    if (remaining <= 0) {
+      clearInterval(interval);
+      display.textContent = '00:00';
+      if (!submitted) {
+        alert('Time is up! Your test will be submitted automatically.');
+        submitted = true;
+        window.removeEventListener('beforeunload', beforeUnload);
+        form.submit();
+      }
+      return;
+    }
+    remaining -= 1;
+    render();
+  }, 1000);
+
+  function beforeUnload(e) {
+    if (warnOnLeave && !submitted) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  }
+
+  window.addEventListener('beforeunload', beforeUnload);
+
+  form.addEventListener('submit', function() {
+    submitted = true;
+    window.removeEventListener('beforeunload', beforeUnload);
+  });
+})();
+</script>
+{% endblock %}

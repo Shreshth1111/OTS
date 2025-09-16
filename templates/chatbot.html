@@ -1,0 +1,83 @@
+{% extends 'main.html' %}
+{% block title %}Test Assistant Chatbot{% endblock %}
+{% block top %}
+<a href="{% url 'OTS:home' %}"><i class="fas fa-home"></i> Home</a>
+<a href="{% url 'OTS:testHistory' %}"><i class="fas fa-history"></i> History</a>
+{% if result %}<a href="{% url 'OTS:testDetail' %}?resultid={{ result.resultid }}"><i class="fas fa-search"></i> Review</a>{% endif %}
+{% endblock %}
+{% block content %}
+<div class="result-container">
+  <div class="result-header">
+    <i class="fas fa-robot"></i>
+    <h1>Test Assistant</h1>
+    {% if result %}
+      <p>Chatting about your latest test (Result #{{ result.resultid }})</p>
+    {% else %}
+      <p>You haven't taken any tests yet. Take a test first.</p>
+    {% endif %}
+  </div>
+
+  <div id="chat-box" style="background:#fff;border-radius:16px;box-shadow:0 10px 24px rgba(0,0,0,0.08);padding:16px;max-width:800px;margin:0 auto;min-height:260px;">
+    <div id="messages" style="display:flex;flex-direction:column;gap:10px;">
+      <div style="align-self:flex-start;background:#EEF2FF;color:#1f2937;padding:10px 12px;border-radius:10px;max-width:80%;">
+        Hello! I can explain your score, list mistakes, or explain a specific question. Try typing: "show my mistakes" or "explain question 12".
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <input id="chat-input" type="text" placeholder="Type your question..." style="flex:1;border:1px solid #e5e7eb;border-radius:10px;padding:10px;">
+      <button id="send-btn" style="background:#4F46E5;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-weight:700;">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var rid = {{ result.resultid|default:"null" }};
+  var messages = document.getElementById('messages');
+  var input = document.getElementById('chat-input');
+  var send = document.getElementById('send-btn');
+
+  function addBubble(text, side) {
+    var div = document.createElement('div');
+    div.style.maxWidth = '80%';
+    div.style.padding = '10px 12px';
+    div.style.borderRadius = '10px';
+    div.style.whiteSpace = 'pre-wrap';
+    if (side === 'right') {
+      div.style.alignSelf = 'flex-end';
+      div.style.background = '#10B981';
+      div.style.color = '#fff';
+    } else {
+      div.style.alignSelf = 'flex-start';
+      div.style.background = '#F3F4F6';
+      div.style.color = '#1f2937';
+    }
+    div.textContent = text;
+    messages.appendChild(div);
+    messages.parentElement.scrollTop = messages.parentElement.scrollHeight;
+  }
+
+  send.addEventListener('click', async function() {
+    var text = input.value.trim();
+    if (!text) return;
+    addBubble(text, 'right');
+    input.value = '';
+    try {
+      var res = await fetch('{% url "OTS:apiChat" %}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, resultid: rid })
+      });
+      var data = await res.json();
+      addBubble(data.reply || 'Sorry, I could not process that.', 'left');
+    } catch (e) {
+      addBubble('Network error. Please try again.', 'left');
+    }
+  });
+
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') send.click();
+  });
+})();
+</script>
+{% endblock %}

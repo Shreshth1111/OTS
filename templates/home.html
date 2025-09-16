@@ -1,0 +1,58 @@
+{% extends 'main.html' %}
+{% block title%}OTS Candidate Home Page{% endblock %}
+{% block top%}
+<a href="{% url 'OTS:home' %}"><i class="fas fa-home"></i> Home</a>
+<a href="{% url 'OTS:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="welcome-section">
+        <div class="welcome-card">
+            <i class="fas fa-user-circle"></i>
+            <h1>Welcome {{request.session.name}}</h1>
+            <p>Ready to test your knowledge? Choose a test below to get started.</p>
+        </div>
+    </div>
+    
+    <div class="test-options">
+        <h2><i class="fas fa-clipboard-list"></i> Available Tests</h2>
+        <div class="test-grid">
+            <div class="test-card quick">
+                <div class="test-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Quick Test</h3>
+                <p>3 Questions • ~3 minutes</p>
+                <a href="{% url 'OTS:testPaper' %}?n=3" class="test-btn">Start Test</a>
+            </div>
+            
+            <div class="test-card standard">
+                <div class="test-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h3>Standard Test</h3>
+                <p>5 Questions • ~5 minutes</p>
+                <a href="{% url 'OTS:testPaper' %}?n=5" class="test-btn">Start Test</a>
+            </div>
+            
+            <div class="test-card extended">
+                <div class="test-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Extended Test</h3>
+                <p>10 Questions • ~10 minutes</p>
+                <a href="{% url 'OTS:testPaper' %}?n=10" class="test-btn">Start Test</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="quick-actions">
+        <div class="action-card">
+            <i class="fas fa-history"></i>
+            <h3>Test History</h3>
+            <p>View your previous test results and track your progress</p>
+            <a href="{% url 'OTS:testHistory' %}" class="action-btn">View History</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'main.html' %}
+{% block title%}Welcome to Online Testing System {% endblock %}
+{% block top%}
+<a href="{% url 'OTS:registrationForm' %}"><i class="fas fa-user-plus"></i> Signup</a>
+<a href="{% url 'OTS:login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+{% endblock %}
+{% block content %}
+<div class="welcome-container">
+    <div class="hero-section">
+        <div class="hero-icon">
+            <i class="fas fa-graduation-cap"></i>
+        </div>
+        <h1>Welcome to Online Testing System</h1>
+        <p>Test your knowledge and track your progress with our comprehensive testing platform</p>
+        
+        <div class="hero-actions">
+            <a href="{% url 'OTS:login' %}" class="hero-btn primary">
+                <i class="fas fa-sign-in-alt"></i> Get Started
+            </a>
+            <a href="{% url 'OTS:registrationForm' %}" class="hero-btn secondary">
+                <i class="fas fa-user-plus"></i> Create Account
+            </a>
+        </div>
+    </div>
+    
+    <div class="features-section">
+        <div class="feature-card">
+            <i class="fas fa-brain"></i>
+            <h3>Smart Testing</h3>
+            <p>Comprehensive question bank with varied difficulty levels</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-chart-line"></i>
+            <h3>Track Progress</h3>
+            <p>Monitor your performance and improvement over time</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-clock"></i>
+            <h3>Flexible Timing</h3>
+            <p>Choose from quick tests to comprehensive assessments</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

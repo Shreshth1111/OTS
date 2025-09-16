@@ -1,0 +1,59 @@
+{% extends 'main.html' %}
+
+{% block title %}OTS Test Result{% endblock %}
+
+{% block top %}
+<a href="{% url 'OTS:home' %}"><i class="fas fa-home"></i> Home</a>
+<a href="{% url 'OTS:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+{% endblock %}
+
+{% block content %}
+<div class="result-container">
+    <div class="result-header">
+        <i class="fas fa-chart-line"></i>
+        <h1>Test Results</h1>
+        <p>Your performance summary</p>
+    </div>
+    
+    <div class="result-table-container">
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-calendar"></i> Date</th>
+                    <th><i class="fas fa-clock"></i> Time</th>
+                    <th><i class="fas fa-list-ol"></i> Attempted</th>
+                    <th><i class="fas fa-check"></i> Correct</th>
+                    <th><i class="fas fa-times"></i> Wrong</th>
+                    <th><i class="fas fa-star"></i> Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in result %}
+                <tr>
+                    <td>{{ r.date }}</td>
+                    <td>{{ r.time }}</td>
+                    <td>{{ r.attempt }}</td>
+                    <td class="correct">{{ r.right }}</td>
+                    <td class="wrong">{{ r.wrong }}</td>
+                    <td class="points">{{ r.points|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="result-actions">
+        {% for r in result %}
+        <a href="{% url 'OTS:testDetail' %}?resultid={{ r.resultid }}" class="action-btn primary">
+            <i class="fas fa-search"></i> Review This Test
+        </a>
+        <a href="{% url 'OTS:chatbot' %}?resultid={{ r.resultid }}" class="action-btn secondary">
+            <i class="fas fa-robot"></i> Ask Chatbot About This Test
+        </a>
+        {% endfor %}
+        <a href="{% url 'OTS:testHistory' %}" class="action-btn secondary">
+            <i class="fas fa-history"></i> View All Results
+        </a>
+    </div>
+</div>
+{% endblock %}

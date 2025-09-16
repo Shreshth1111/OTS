@@ -1,0 +1,71 @@
+{% extends 'main.html' %}
+{% block title %}Test Review{% endblock %}
+{% block top %}
+<a href="{% url 'OTS:home' %}"><i class="fas fa-home"></i> Home</a>
+<a href="{% url 'OTS:testHistory' %}"><i class="fas fa-history"></i> History</a>
+<a href="{% url 'OTS:chatbot' %}{% if result %}?resultid={{ result.resultid }}{% endif %}"><i class="fas fa-robot"></i> Chatbot</a>
+{% endblock %}
+{% block content %}
+<div class="result-container">
+  <div class="result-header">
+    <i class="fas fa-search"></i>
+    <h1>Review Test</h1>
+    <p>Attempted: {{ result.attempt }} • Correct: {{ result.right }} • Wrong: {{ result.wrong }} • Points: {{ result.points|floatformat:2 }}/10</p>
+  </div>
+
+  {% if result.details %}
+  <div class="history-table-container">
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Question</th>
+          <th>Your Answer</th>
+          <th>Correct Answer</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in result.details %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>
+            <div class="text-gray-900 font-medium">{{ d.question }}</div>
+            <div class="text-sm text-gray-600 mt-1">
+              A) {{ d.options.A }} • B) {{ d.options.B }} • C) {{ d.options.C }} • D) {{ d.options.D }}
+            </div>
+          </td>
+          <td class="{% if d.is_correct %}correct{% else %}wrong{% endif %}">
+            {% if d.user != '-' %}{{ d.user }}) {{ d.options[d.user] }}{% else %}-{% endif %}
+          </td>
+          <td class="correct">
+            {{ d.correct }}) {{ d.options[d.correct] }}
+          </td>
+          <td>
+            {% if d.is_correct %}
+              <span class="inline-flex items-center px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">Correct</span>
+            {% else %}
+              <span class="inline-flex items-center px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold">Wrong</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="text-center p-6 bg-white rounded-xl shadow">
+      <p>No detailed answers available for this test.</p>
+    </div>
+  {% endif %}
+
+  <div class="result-actions">
+    <a href="{% url 'OTS:chatbot' %}?resultid={{ result.resultid }}" class="action-btn primary">
+      <i class="fas fa-robot"></i> Ask the Chatbot about this test
+    </a>
+    <a href="{% url 'OTS:testHistory' %}" class="action-btn secondary">
+      <i class="fas fa-history"></i> Back to History
+    </a>
+  </div>
+</div>
+{% endblock %}
